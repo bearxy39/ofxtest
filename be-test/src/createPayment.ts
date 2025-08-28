@@ -1,21 +1,8 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { v4 as uuidv4 } from 'uuid';
 import { buildResponse, parseInput } from './lib/apigateway';
 import { createPayment, Payment } from './lib/payments';
-import { v4 as uuidv4 } from 'uuid';
-
-const isValidCurrencyCode = (code: string): boolean => {
-    if (!code) return false;
-    try {
-        new Intl.NumberFormat('en', { style: 'currency', currency: code });
-        return true;
-    } catch {
-        return false;
-    }
-};
-
-const hasAtMostTwoDecimals = (n: number): boolean => {
-    return Number.isInteger(n * 100);
-};
+import { isValidCurrencyCode, hasAtMostTwoDecimals } from './lib/utils';
 
 const isValidPayment = (payment: Payment): boolean => {
     if (!payment?.amount || payment?.amount <= 0 || !hasAtMostTwoDecimals(payment?.amount)) return false;
